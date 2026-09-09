@@ -129,6 +129,12 @@ CHALLENGE_DAY = 3       # четверг
 SATURDAY = 5            # суббота
 REST_DAY = 6            # воскресенье
 
+# Лимиты попыток в день
+LIMIT_QUIZ = 1       # викторина (пн/ср/пт)
+LIMIT_FACT = 2       # вторник
+LIMIT_CHALLENGE = 2  # четверг (прокруты колеса)
+LIMIT_SATURDAY = 1   # суббота
+
 # Часовой пояс Нячанга (Вьетнам). Игра идёт по времени дочери.
 NHATRANG = ZoneInfo("Asia/Ho_Chi_Minh")
 
@@ -143,7 +149,7 @@ def weekday_nhatrang():
     return today_nhatrang().weekday()
 
 
-def load_played():
+def load_data():
     try:
         with open(PLAYED_FILE, "r") as f:
             return json.load(f)
@@ -151,21 +157,31 @@ def load_played():
         return {}
 
 
-def save_played(data):
+def save_data(data):
     with open(PLAYED_FILE, "w") as f:
         json.dump(data, f)
 
 
-def already_played_today(chat_id):
-    data = load_played()
+def get_count(chat_id):
+    """Сколько раз этот чат уже играл сегодня."""
+    data = load_data()
     today = today_nhatrang().isoformat()
-    return data.get(str(chat_id)) == today
+    rec = data.get(str(chat_id))
+    if rec and rec.get("date") == today:
+        return rec.get("count", 0)
+    return 0
 
 
-def mark_played_today(chat_id):
-    data = load_played()
-    data[str(chat_id)] = today_nhatrang().isoformat()
-    save_played(data)
+def add_count(chat_id):
+    """Увеличить счётчик попыток на сегодня."""
+    data = load_data()
+    today = today_nhatrang().isoformat()
+    rec = data.get(str(chat_id))
+    if rec and rec.get("date") == today:
+        rec["count"] = rec.get("count", 0) + 1
+    else:
+        data[str(chat_id)] = {"date": today, "count": 1}
+    save_data(data)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -197,8 +213,15 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Вторник — случайный факт
+    # Вторник — 2 факта в день
     if today == FACT_DAY:
+        if get_count(chat_id) >= LIMIT_FACT:
+            await update.message.reply_text(
+                "✅ На сегодня хватит фактов!\n\n"
+                "Приходи завтра за новыми знаниями 😉"
+            )
+            return
+        add_count(chat_id)
         fact = random.choice(FACTS)
         await update.message.reply_text(
             "💡 ЗНАЕШЬ ЛИ ТЫ?\n\n"
@@ -207,8 +230,14 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Четверг — колесо челленджей (одна кнопка «Крутить!»)
+    # Четверг — колесо (2 прокрута в день, лимит проверяем при нажатии кнопки)
     if today == CHALLENGE_DAY:
+        if get_count(chat_id) >= LIMIT_CHALLENGE:
+            await update.message.reply_text(
+                "✅ Ты уже прокрутила колесо 2 раза сегодня!\n\n"
+                "Приходи завтра 😉"
+            )
+            return
         keyboard = [[InlineKeyboardButton("🎯 КРУТИТЬ!", callback_data="spin")]]
         await update.message.reply_text(
             "🎯 КОЛЕСО ЧЕЛЛЕНДЖЕЙ!\n\n"
@@ -217,8 +246,15 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Суббота — задание для папы / творчество
+    # Суббота — 1 задание в день
     if today == SATURDAY:
+        if get_count(chat_id) >= LIMIT_SATURDAY:
+            await update.message.reply_text(
+                "✅ Задание на сегодня ты уже получила!\n\n"
+                "Выполни его для папы 😊"
+            )
+            return
+        add_count(chat_id)
         task = random.choice(SATURDAY_TASKS)
         await update.message.reply_text(
             "✍️ ЗАДАНИЕ ДНЯ!\n\n"
@@ -226,9 +262,9 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Пн/Ср/Пт — викторина
+    # Пн/Ср/Пт — викторина, 1 раз в день
     if today in PLAY_DAYS:
-        if already_played_today(chat_id):
+        if get_count(chat_id) >= LIMIT_QUIZ:
             await update.message.reply_text(
                 "✅ Ты уже играла сегодня!\n\n"
                 "Приходи в следующий игровой день 😉"
@@ -275,7 +311,7 @@ async def choose_card(update: Update, context: ContextTypes.DEFAULT_TYPE):
     result = cards[chosen]
 
     context.chat_data.pop("cards", None)
-    mark_played_today(update.effective_chat.id)
+    add_count(update.effective_chat.id)
 
     await query.edit_message_text(
         f"🎉 ТЫ ВЫБРАЛА КАРТУ №{chosen + 1}!\n\n"
@@ -290,6 +326,18 @@ async def choose_card(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def spin_wheel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+
+    chat_id = update.effective_chat.id
+
+    # Проверяем лимит прокрутов в момент нажатия
+    if get_count(chat_id) >= LIMIT_CHALLENGE:
+        await query.edit_message_text(
+            "✅ Ты уже прокрутила колесо 2 раза сегодня!\n\n"
+            "Приходи завтра 😉"
+        )
+        return
+
+    add_count(chat_id)
     challenge = random.choice(CHALLENGES)
     await query.edit_message_text(
         "🎯 ТВОЙ ЧЕЛЛЕНДЖ:\n\n"
