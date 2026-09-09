@@ -2,6 +2,7 @@ import os
 import random
 import json
 import datetime
+from zoneinfo import ZoneInfo
 from threading import Thread
 from flask import Flask
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -18,7 +19,20 @@ CARDS = [
 PLAY_DAYS = [0, 2, 4]   # понедельник=0, среда=2, пятница=4
 REST_DAY = 6            # воскресенье=6
 
+# Часовой пояс Нячанга (Вьетнам). Игра идёт по времени дочери.
+NHATRANG = ZoneInfo("Asia/Ho_Chi_Minh")
+
 PLAYED_FILE = "played.json"
+
+
+def today_nhatrang():
+    """Текущая дата по времени Нячанга."""
+    return datetime.datetime.now(NHATRANG).date()
+
+
+def weekday_nhatrang():
+    """День недели по времени Нячанга (понедельник=0 ... воскресенье=6)."""
+    return today_nhatrang().weekday()
 
 
 def load_played():
@@ -36,13 +50,13 @@ def save_played(data):
 
 def already_played_today(chat_id):
     data = load_played()
-    today = datetime.date.today().isoformat()
+    today = today_nhatrang().isoformat()
     return data.get(str(chat_id)) == today
 
 
 def mark_played_today(chat_id):
     data = load_played()
-    data[str(chat_id)] = datetime.date.today().isoformat()
+    data[str(chat_id)] = today_nhatrang().isoformat()
     save_played(data)
 
 
@@ -55,7 +69,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    today = datetime.date.today().weekday()
+    today = weekday_nhatrang()
     chat_id = update.effective_chat.id
 
     # Воскресенье — выходной с напоминанием
@@ -63,9 +77,10 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             "🌙 Сегодня выходной от игры!\n\n"
             "Но у тебя есть важные задания на сегодня:\n\n"
-            "📞 Позвони папе!\n"
+            "📞 Позвони или напиши папе!\n"
             "❤️ Сделай несколько добрых дел.\n\n"
-            "Викторина вернётся в понедельник 😉"
+            "💰 Оплата за этот день сохраняется!\n\n"
+            "Викторина вернётся в понедельник. Have a nice day! 😉"
         )
         return
 
@@ -126,7 +141,6 @@ async def choose_card(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chosen = int(query.data)
     result = cards[chosen]
 
-    # Убираем карты и отмечаем, что сегодня уже сыграли
     context.chat_data.pop("cards", None)
     mark_played_today(update.effective_chat.id)
 
