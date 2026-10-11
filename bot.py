@@ -458,7 +458,7 @@ async def box(update: Update, context: ContextTypes.DEFAULT_TYPE):
     random.shuffle(boxes)
     context.chat_data["boxes"] = boxes
 
-   keyboard = [
+       keyboard = [
         [
             InlineKeyboardButton("1 🃏", callback_data="box_0"),
             InlineKeyboardButton("2 🃏", callback_data="box_1"),
