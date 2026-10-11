@@ -244,12 +244,12 @@ NHATRANG = ZoneInfo("Asia/Ho_Chi_Minh")
 PLAYED_FILE = "played.json"
 
 
+def today_nhatrang():
+    return datetime.datetime.now(NHATRANG).date()
+
+
 def weekday_nhatrang():
     return 3  # ВРЕМЕННО: тест четверга. Потом удалить эту строку!
-    return today_nhatrang().weekday()
-
-
-def weekday_nhatrang():
     return today_nhatrang().weekday()
 
 
