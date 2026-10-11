@@ -249,7 +249,6 @@ def today_nhatrang():
 
 
 def weekday_nhatrang():
-    return 1  # ВРЕМЕННО: тест вторника. Потом удалить эту строку!
     return today_nhatrang().weekday()
 
 
