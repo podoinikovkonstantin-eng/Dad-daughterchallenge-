@@ -19,7 +19,6 @@ CARDS = [
 
 # ===== ВТОРНИК: «Знаешь ли ты?» =====
 FACTS = [
-    # Страны и география
     "🇯🇵 В Японии есть остров Окуносима, где живут сотни диких кроликов.",
     "🇷🇺 Россия — самая большая страна мира, она граничит с 14 странами.",
     "🇻🇳 Вьетнам — второй в мире экспортёр кофе после Бразилии.",
@@ -47,7 +46,6 @@ FACTS = [
     "🇲🇦 В Марокко есть город Шефшауэн, где почти все дома синие.",
     "🇵🇪 В Перу находится древний город инков Мачу-Пикчу высоко в горах.",
     "🇯🇴 В Иордании есть город Петра, вырезанный прямо в скалах.",
-    # Анатомия и тело
     "🦴 У новорождённого около 300 костей, а у взрослого — 206: часть срастается.",
     "🫀 Сердце бьётся примерно 100 000 раз в день.",
     "🧠 Мозг работает даже во сне — иногда активнее, чем днём.",
@@ -68,14 +66,12 @@ FACTS = [
     "💇 На голове в среднем около 100 000 волос.",
     "👃 Человек может различать около триллиона запахов.",
     "💧 Тело человека примерно на 60% состоит из воды.",
-    # Космос
     "🪐 Кольца Сатурна состоят изо льда и камней — некоторые размером с дом.",
     "🌕 Следы астронавтов на Луне останутся миллионы лет — там нет ветра.",
     "☀️ Внутри Солнца поместился бы миллион таких планет, как Земля.",
     "🌟 Свет от Солнца летит до Земли около 8 минут.",
     "🔴 Марс красный из-за ржавчины — железа в его почве.",
     "🌌 В нашей галактике больше 100 миллиардов звёзд.",
-    # Животные и природа
     "🐙 У осьминога голубая кровь и девять «мозгов».",
     "🦒 У жирафа и у человека одинаковое число шейных позвонков — семь.",
     "🐬 Дельфины спят, отключая только половину мозга.",
@@ -84,7 +80,6 @@ FACTS = [
     "🐧 Пингвины умеют выпрыгивать из воды почти на два метра.",
     "🌳 Деревья «общаются» через грибницу под землёй.",
     "🦋 Бабочка-монарх пролетает тысячи километров во время перелёта.",
-    # Математика и наука
     "🔢 Если сложить все числа от 1 до 100, получится ровно 5050.",
     "♾ Число «пи» бесконечно и никогда не повторяется.",
     "🍕 Пицца помогает понять дроби: 1/2, 1/4, 1/8 — это кусочки.",
@@ -97,12 +92,10 @@ FACTS = [
     "📏 Миллион секунд — это 11 дней, а миллиард секунд — почти 32 года.",
     "🏅 США — лидер по Нобелевским премиям: более 400 лауреатов, у России и СССР — около 30.",
     "👮 В России около 525–643 полицейских на 100 000 человек, в США — примерно 250.",
-    # Книга рекордов Гиннеса
     "📕 Самый высокий человек в истории был ростом 272 см.",
     "📕 Самая маленькая собака в мире помещается в ладонь.",
     "📕 Самая длинная кошка была длиннее метра.",
     "📕 Самое длинное научное слово содержит почти 190 000 букв.",
-    # Английские идиомы
     "🇬🇧 Idiom: \"Piece of cake\" — something very easy to do.",
     "🇬🇧 Idiom: \"Break the ice\" — to start a conversation in a friendly way.",
     "🇬🇧 Idiom: \"Hit the books\" — to study hard.",
@@ -111,7 +104,6 @@ FACTS = [
     "🇬🇧 Idiom: \"Spill the beans\" — to tell a secret.",
     "🇬🇧 Idiom: \"A bookworm\" — a person who loves reading.",
     "🇬🇧 Idiom: \"Butterflies in your stomach\" — feeling nervous or excited.",
-    # Английские сокращения
     "🔤 ASAP — As Soon As Possible (как можно скорее).",
     "🔤 FYI — For Your Information (к твоему сведению).",
     "🔤 DIY — Do It Yourself (сделай сам).",
@@ -120,7 +112,6 @@ FACTS = [
     "🔤 AKA — Also Known As (также известный как).",
     "🔤 BTW — By The Way (кстати).",
     "🔤 IMO — In My Opinion (по-моему).",
-    # Английские факты
     "🇬🇧 Did you know? Honey never spoils.",
     "🇬🇧 Did you know? Octopuses have three hearts.",
     "🇬🇧 Did you know? A day on Venus is longer than its year.",
@@ -223,13 +214,13 @@ ART_TASKS = [
 ]
 
 # ===== Дни недели =====
-PLAY_DAYS = [0, 2, 4]   # викторина: пн, ср, пт
-FACT_DAY = 1            # вторник
-CHALLENGE_DAY = 3       # четверг
-SATURDAY = 5            # суббота
-REST_DAY = 6            # воскресенье
+PLAY_DAYS = [0, 2, 4]
+FACT_DAY = 1
+CHALLENGE_DAY = 3
+SATURDAY = 5
+REST_DAY = 6
 
-# Лимиты попыток в день (на каждую отдельную механику)
+# Лимиты
 LIMIT_QUIZ = 1
 LIMIT_FACT = 1
 LIMIT_CHALLENGE = 1
@@ -238,9 +229,7 @@ LIMIT_BOX = 1
 LIMIT_LUCK = 1
 LIMIT_ART = 1
 
-# Часовой пояс Нячанга (Вьетнам)
 NHATRANG = ZoneInfo("Asia/Ho_Chi_Minh")
-
 PLAYED_FILE = "played.json"
 
 
@@ -267,7 +256,6 @@ def save_data(data):
 
 
 def get_count(chat_id, key):
-    """Сколько раз этот чат уже использовал механику 'key' сегодня."""
     data = load_data()
     today = today_nhatrang().isoformat()
     rec = data.get(str(chat_id), {})
@@ -277,7 +265,6 @@ def get_count(chat_id, key):
 
 
 def add_count(chat_id, key):
-    """Увеличить счётчик механики 'key' на сегодня."""
     data = load_data()
     today = today_nhatrang().isoformat()
     rec = data.get(str(chat_id), {})
@@ -308,7 +295,6 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
     today = weekday_nhatrang()
     chat_id = update.effective_chat.id
 
-    # Воскресенье — выходной
     if today == REST_DAY:
         await update.message.reply_text(
             "🌙 Сегодня выходной от игры!\n\n"
@@ -320,7 +306,6 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Вторник — факт
     if today == FACT_DAY:
         if get_count(chat_id, "fact") >= LIMIT_FACT:
             await update.message.reply_text(
@@ -338,7 +323,6 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Четверг — колесо челленджей
     if today == CHALLENGE_DAY:
         if get_count(chat_id, "challenge") >= LIMIT_CHALLENGE:
             await update.message.reply_text(
@@ -355,7 +339,6 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Суббота — задание папе
     if today == SATURDAY:
         if get_count(chat_id, "saturday") >= LIMIT_SATURDAY:
             await update.message.reply_text(
@@ -372,7 +355,6 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Пн/Ср/Пт — викторина
     if today in PLAY_DAYS:
         if get_count(chat_id, "quiz") >= LIMIT_QUIZ:
             await update.message.reply_text(
