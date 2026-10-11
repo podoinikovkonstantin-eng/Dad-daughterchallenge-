@@ -238,8 +238,7 @@ def today_nhatrang():
 
 
 def weekday_nhatrang():
-    return 3  # ВРЕМЕННО: тест четверга. Потом удалить эту строку!
-    return today_nhatrang().weekday()
+        return today_nhatrang().weekday()
 
 
 def load_data():
@@ -460,20 +459,20 @@ async def box(update: Update, context: ContextTypes.DEFAULT_TYPE):
     random.shuffle(boxes)
     context.chat_data["boxes"] = boxes
 
-    keyboard = [
+   keyboard = [
         [
-            InlineKeyboardButton("🎴 1", callback_data="box_0"),
-            InlineKeyboardButton("🎴 2", callback_data="box_1"),
-            InlineKeyboardButton("🎴 3", callback_data="box_2"),
-            InlineKeyboardButton("🎴 4", callback_data="box_3"),
-            InlineKeyboardButton("🎴 5", callback_data="box_4")
+            InlineKeyboardButton("1 🃏", callback_data="box_0"),
+            InlineKeyboardButton("2 🃏", callback_data="box_1"),
+            InlineKeyboardButton("3 🃏", callback_data="box_2"),
+            InlineKeyboardButton("4 🃏", callback_data="box_3"),
+            InlineKeyboardButton("5 🃏", callback_data="box_4")
         ],
         [
-            InlineKeyboardButton("🎴 6", callback_data="box_5"),
-            InlineKeyboardButton("🎴 7", callback_data="box_6"),
-            InlineKeyboardButton("🎴 8", callback_data="box_7"),
-            InlineKeyboardButton("🎴 9", callback_data="box_8"),
-            InlineKeyboardButton("🎴 10", callback_data="box_9")
+            InlineKeyboardButton("6 🃏", callback_data="box_5"),
+            InlineKeyboardButton("7 🃏", callback_data="box_6"),
+            InlineKeyboardButton("8 🃏", callback_data="box_7"),
+            InlineKeyboardButton("9 🃏", callback_data="box_8"),
+            InlineKeyboardButton("10 🃏", callback_data="box_9")
         ]
     ]
     await update.message.reply_text(
