@@ -238,8 +238,7 @@ def today_nhatrang():
 
 
 def weekday_nhatrang():
-        return today_nhatrang().weekday()
-
+    return today_nhatrang().weekday()
 
 def load_data():
     try:
