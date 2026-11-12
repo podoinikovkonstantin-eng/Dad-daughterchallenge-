@@ -210,7 +210,7 @@ ART_TASKS = [
     "🤖 Сделай в нейросети забавное фото с папой (например, вы в виде животных) и отправь в группу. (+$1)"
 ]
 
-# ===== ВИКТОРИНА «МИЛЛИОН» (вопрос, варианты, индекс правильного) =====
+# ===== ВИКТОРИНА «МИЛЛИОН ОТ ХУЛИБАМА» (вопрос, варианты, индекс правильного) =====
 MILLION = [
     ("Продолжи ряд: 2, 4, 8, 16, ...", ["20", "24", "32", "18"], 2),
     ("Что лишнее?", ["яблоко", "груша", "морковь", "банан"], 2),
@@ -307,7 +307,7 @@ LIMIT_SATURDAY = 1
 LIMIT_BOX = 1
 LIMIT_LUCK = 1
 LIMIT_ART = 1
-LIMIT_MILLION = 3
+LIMIT_MILLION = 1  # один заход из 3 вопросов в день
 
 NHATRANG = ZoneInfo("Asia/Ho_Chi_Minh")
 PLAYED_FILE = "played.json"
@@ -366,7 +366,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✍️ Суббота — Задание для папы  →  /quiz\n"
         "🎨 Суббота — Творческий конкурс  →  /art\n"
         "🌙 Воскресенье — выходной\n\n"
-        "🏆 А ещё в любой день: /million — викторина «Кто заберёт миллион у Хулибама?»\n\n"
+        "🏆 Любой день: /million — «Миллион от Хулибама» (3 вопроса)\n\n"
         "Начни с /quiz!"
     )
 
@@ -648,33 +648,43 @@ async def art(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def million(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
-
-    if get_count(chat_id, "million") >= LIMIT_MILLION:
-        await update.message.reply_text(
-            "✅ На сегодня хватит вопросов!\n\n"
-            "Приходи завтра за новой порцией 🏆"
-        )
-        return
-
-    q_index = random.randrange(len(MILLION))
-    question, options, correct = MILLION[q_index]
-
+async def send_million_question(chat_id, context):
+    queue = context.chat_data.get("mil_queue", [])
+    step = context.chat_data.get("mil_step", 0)
+    question, options, correct = MILLION[queue[step]]
     letters = ["А", "Б", "В", "Г"]
     keyboard = [
         [InlineKeyboardButton(f"{letters[i]}. {options[i]}", callback_data=f"mil_{i}_{correct}")]
         for i in range(len(options))
     ]
-
-    await update.message.reply_text(
-        "🏆 КТО ЗАБЕРЁТ МИЛЛИОН У ХУЛИБАМА?\n\n"
+    await context.bot.send_message(
+        chat_id,
+        f"🏆 МИЛЛИОН ОТ ХУЛИБАМА — вопрос {step + 1} из 3\n\n"
         f"━━━━━━━━━━━━━━\n\n"
         f"❓ {question}\n\n"
         f"━━━━━━━━━━━━━━\n\n"
         "Выбери правильный ответ! 👇",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+
+
+async def million(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+
+    if get_count(chat_id, "million") >= LIMIT_MILLION:
+        await update.message.reply_text(
+            "✅ Три вопроса на сегодня ты уже прошла!\n\n"
+            "Приходи завтра за новой тройкой 🏆"
+        )
+        return
+
+    add_count(chat_id, "million")
+    indices = random.sample(range(len(MILLION)), 3)
+    context.chat_data["mil_queue"] = indices
+    context.chat_data["mil_step"] = 0
+    context.chat_data["mil_score"] = 0
+
+    await send_million_question(chat_id, context)
 
 
 async def million_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -684,22 +694,30 @@ async def million_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     parts = query.data.split("_")
     chosen = int(parts[1])
     correct = int(parts[2])
-
-    add_count(update.effective_chat.id, "million")
-
     letters = ["А", "Б", "В", "Г"]
 
+    score = context.chat_data.get("mil_score", 0)
     if chosen == correct:
-        await query.edit_message_text(
-            "🎉 ВЕРНО! Молодец!\n\n"
-            f"Правильный ответ: {letters[correct]} ✅\n\n"
-            "Хулибам впечатлён! Жми /million для следующего вопроса 🏆"
-        )
+        score += 1
+        verdict = "🎉 ВЕРНО!"
     else:
+        verdict = f"❌ Увы! Правильный ответ: {letters[correct]}"
+    context.chat_data["mil_score"] = score
+
+    step = context.chat_data.get("mil_step", 0) + 1
+    context.chat_data["mil_step"] = step
+
+    if step < 3:
+        await query.edit_message_text(f"{verdict}\n\nСледующий вопрос... 👇")
+        await send_million_question(update.effective_chat.id, context)
+    else:
+        total = context.chat_data.get("mil_score", 0)
         await query.edit_message_text(
-            "❌ Не угадала!\n\n"
-            f"Правильный ответ: {letters[correct]} ✅\n\n"
-            "В следующий раз получится! Жми /million ещё раз 💪"
+            f"{verdict}\n\n"
+            f"━━━━━━━━━━━━━━\n\n"
+            f"🏁 ИТОГ: {total} из 3 верных!\n\n"
+            f"Папа посчитает твою награду 💰\n"
+            f"Приходи завтра за новой тройкой! 🏆"
         )
 
 
